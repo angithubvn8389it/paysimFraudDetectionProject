@@ -1,91 +1,112 @@
-# Paysim Fraud Detection Pipeline
+# Phát hiện gian lận theo thời gian thực theo bộ dữ liệu Paysim
 
-This project implements an end-to-end Machine Learning pipeline to detect fraudulent transactions using the Paysim dataset. 
+![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)
+![PySpark](https://img.shields.io/badge/PySpark-Spark-E25A1C?logo=apachespark&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248?logo=mongodb&logoColor=white)
 
-## Hướng dẫn (Tiếng Việt)
+Dự án này xây dựng một pipeline học máy đầu-cuối để phát hiện giao dịch gian lận trên bộ dữ liệu Paysim. Hệ thống sử dụng PySpark để xử lý dữ liệu lớn, huấn luyện mô hình Random Forest, đánh giá kết quả và xuất các biểu đồ, metrics cũng như dự đoán ra file hoặc MongoDB.
 
-Dự án này triển khai một pipeline học máy đầu-cuối để phát hiện giao dịch gian lận trên dữ liệu Paysim.
+## Giới thiệu
 
-### Yêu cầu
-- Python 3.8+ và `pip`
-- Java (bản tương thích với PySpark nếu cần)
-- MongoDB (local hoặc Atlas)
-- Các thư viện Python trong `requirements.txt`
+Mục tiêu của dự án là:
 
-### Cài đặt nhanh
-1. Cài đặt các thư viện:
+- phát hiện các giao dịch có khả năng gian lận;
+- xử lý dữ liệu giao dịch lớn bằng Spark;
+- so sánh nhanh giữa mô hình baseline và mô hình Random Forest;
+- lưu lại kết quả đánh giá để dễ theo dõi và tái sử dụng.
+
+## Thông tin về chương trình
+
+Các thành phần chính trong dự án:
+
+- `main.py`: chạy toàn bộ pipeline huấn luyện và đánh giá.
+- `baseline.py`: chạy mô hình baseline để so sánh.
+- `timing.py`: đo thời gian thực thi các giai đoạn của pipeline.
+- `visualization/visualize.py`: tạo các biểu đồ đánh giá như ma trận nhầm lẫn, ROC, Precision-Recall và feature importance.
+- `mongodb/import_data.py`: nhập dữ liệu thô vào MongoDB.
+- `spark/`: chứa các bước tiền xử lý, huấn luyện và đánh giá trên Spark.
+
+Thư mục đầu ra thường gồm:
+
+- `output/metrics.csv`, `output/metrics.json`: các chỉ số đánh giá của mô hình.
+- `output/metrics_baseline.csv`: kết quả của mô hình baseline.
+- `output/timing_models.txt`: thời gian chạy từng giai đoạn của pipeline.
+- `output/`: các biểu đồ và báo cáo được tạo ra trong quá trình chạy.
+
+## Yêu cầu cài đặt
+
+Trước khi chạy dự án, bạn cần có:
+
+- Python 3.8 trở lên;
+- Java tương thích với PySpark;
+- MongoDB local hoặc MongoDB Atlas;
+- các thư viện Python trong `requirements.txt`.
+
+## Cài đặt
+
+1. Cài các thư viện cần thiết:
+
 ```powershell
 python -m pip install -r requirements.txt
 ```
-2. Cấu hình MongoDB: chỉnh `spark/preprocessing/preprocess.py` nếu bạn dùng MongoDB Atlas hoặc thay đổi URI kết nối.
-3. Nếu muốn import dữ liệu raw vào MongoDB (tùy chọn):
+
+2. Cấu hình MongoDB nếu cần:
+
+- kiểm tra và chỉnh URI kết nối trong `spark/preprocessing/preprocess.py`;
+- nếu dùng MongoDB local, bạn có thể import dữ liệu thô trước khi chạy pipeline.
+
+3. Nạp dữ liệu vào MongoDB (tùy chọn):
+
 ```powershell
 python mongodb/import_data.py
 ```
 
-### Chạy pipeline
-Chạy toàn bộ pipeline (Spark + huấn luyện RF + lưu kết quả):
+## Cách sử dụng
+
+### Chạy pipeline chính
+
+Lệnh sau sẽ khởi chạy toàn bộ quy trình: đọc dữ liệu, tiền xử lý, huấn luyện mô hình, đánh giá và lưu kết quả.
+
 ```powershell
 python main.py
 ```
 
-Sau khi chạy xong, kết quả và metrics sẽ được lưu vào thư mục `output/`:
-- `output/metrics.csv`, `output/metrics.json` — số liệu đánh giá trên tập train/validation/test
-- `output/analysis/` — biểu đồ ROC/PR và ma trận nhầm lẫn (nếu bạn chạy script phân tích)
-- `models/` — mô hình được lưu (`models/fraud_rf_model` cho Random Forest, `models/baseline_lr` cho baseline Logistic Regression)
+### Chạy mô hình baseline
 
-### Chạy baseline (Logistic Regression)
-Đã có script baseline để so sánh:
+Nếu bạn muốn chạy mô hình baseline để so sánh với Random Forest:
+
 ```powershell
 python baseline.py
 ```
-Metrics baseline sẽ được lưu tại `output/metrics_baseline.csv`.
 
 ### Đo thời gian thực thi
-Script `timing.py` đo thời gian từng giai đoạn cho cả mô hình baseline và Random Forest (Spark) và lưu vào `output/timing_models.txt`.
 
-### Gợi ý cải tiến tiếp theo
-- Điều chỉnh ngưỡng (threshold) để tối ưu Precision/Recall cho lớp gian lận.
-- Thử các mô hình khác như XGBoost hoặc LightGBM (trên dữ liệu mẫu hoặc chuyển sang Pandas/Scikit-learn nếu không dùng Spark).
-- Thử cân bằng lớp bằng SMOTE hoặc stratified sampling nếu cần.
+Để ghi lại thời gian cho từng giai đoạn của pipeline:
 
-Nếu bạn muốn, tôi có thể tạo một file `README_vi.md` riêng chứa hướng dẫn này hoặc cập nhật nội dung chi tiết hơn.
+```powershell
+python timing.py
+```
 
-## Architecture & Technologies
-- **PySpark**: For distributed data processing, feature engineering, and training the Random Forest classification model.
-- **MongoDB**: Used as the primary data store for the raw transactions and the final model predictions.
-- **Pandas / Imbalanced-learn**: Supported for SMOTE in partitioned processing, though native PySpark undersampling is the default approach for local stability.
+## Kết quả sau khi chạy
 
-## Project Structure
-- `main.py`: The entry point script that orchestrates the whole ML pipeline.
-- `mongodb/`: Scripts related to importing raw CSV data into MongoDB.
-- `spark/`: 
-  - `preprocessing/`: Scripts for data loading, cleaning, categorical encoding, and dealing with class imbalances.
-  - `training/`: Model training logic (Random Forest Classifier) using cross-validation.
-  - `evaluation/`: Scripts to evaluate the model on metrics like AUROC, AUPR, F1-Score, and accuracy.
-- `visualization/`: Scripts to generate visual reports and dashboards based on predictions.
-- `models/`: The saved PySpark ML models are exported here.
+Sau khi chạy xong, bạn sẽ thấy các kết quả chính được lưu trong thư mục `output/` và `models/`:
 
-## How to Run
+- các file metrics để theo dõi hiệu năng mô hình;
+- các biểu đồ đánh giá như ROC, Precision-Recall, ma trận nhầm lẫn;
+- mô hình đã huấn luyện được lưu trong `models/`;
+- dự đoán cuối cùng có thể được ghi vào MongoDB.
 
-1. **Setup MongoDB**: 
-   Ensure you have access to a MongoDB instance (local or Atlas) and update the connection URI in `spark/preprocessing/preprocess.py`. 
-   If using local MongoDB, you can run `mongodb/import_data.py` to seed the database from your raw Paysim CSV file.
-   
-2. **Install Dependencies**: 
-   Install required packages via `pip install -r requirements.txt`. (Make sure your PySpark version is compatible with the MongoDB spark connector).
+## Cấu trúc thư mục
 
-3. **Execute Pipeline**: 
-   Run the main orchestrator script:
-   ```bash
-   python main.py
-   ```
-   This will initialize Spark, load data from MongoDB, preprocess it, train the model, evaluate the metrics, generate visualizations, and write predictions back to MongoDB.
+- `data/`: dữ liệu raw và dữ liệu đã xử lý.
+- `models/`: mô hình đã huấn luyện.
+- `mongodb/`: script nhập dữ liệu và tạo index MongoDB.
+- `output/`: metrics, biểu đồ và các file kết quả.
+- `spark/`: mã nguồn cho xử lý dữ liệu, huấn luyện và đánh giá bằng Spark.
+- `visualization/`: các script trực quan hóa.
 
-## Pipeline Steps
-1. **Initialization**: Configures Spark with the necessary MongoDB connectors and memory settings.
-2. **Data Loading**: Reads transactions directly from MongoDB, utilizing pushdown filters for memory efficiency.
-3. **Preprocessing**: Cleans the data, drops unnecessary high-cardinality columns, encodes categoricals manually to avoid eager evaluation overhead, and casts numeric types.
-4. **Resampling**: Due to the heavy class imbalance in fraud data, the majority class is downsampled to match the minority class before training.
-5. **Model Training**: A Random Forest model is trained with 3-fold Cross Validation to tune hyperparameters (`maxDepth` and `numTrees`).
-6. **Evaluation & Output**: The model is evaluated against a hold-out test set, and the predictions (including predicted probabilities) are saved back to a new MongoDB collection (`fraudDetection.fraudResults`).
+## Ghi chú thêm
+
+- Nếu bạn thay đổi cấu hình MongoDB, hãy kiểm tra lại đường dẫn kết nối trước khi chạy `main.py`.
+- Nếu chỉ muốn xem kết quả so sánh giữa các mô hình, bạn có thể bắt đầu từ `baseline.py` hoặc các file trong `output/`.
+- Nếu cần, tôi có thể tiếp tục tách README này thành một bản rút gọn hơn hoặc viết thêm bản tiếng Anh riêng.
