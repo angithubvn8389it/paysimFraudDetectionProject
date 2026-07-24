@@ -485,7 +485,7 @@ Chạy:
 ```bash
 mongoimport ^
 --db fraudDetection ^
---collection oaysimData ^
+--collection paysimData ^
 --type csv ^
 --headerline ^
 --file paysimLog.csv
@@ -1040,6 +1040,6 @@ Sinh viên thực hiện: **Đặng Đức An**
 
 Môn học: **Nhập môn Phân tích Dữ liệu lớn**
 
-Trường: **Đại học Văn Lang**
+Trường: **Trường Đại học Văn Lang**
 
 Năm học: **2025-2026**
