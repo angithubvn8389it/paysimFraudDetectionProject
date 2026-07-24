@@ -108,6 +108,5 @@ Sau khi chạy xong, bạn sẽ thấy các kết quả chính được lưu tro
 
 ## Ghi chú thêm
 
-- Nếu bạn thay đổi cấu hình MongoDB, hãy kiểm tra lại đường dẫn kết nối trước khi chạy `main.py`.
-- Nếu chỉ muốn xem kết quả so sánh giữa các mô hình, bạn có thể bắt đầu từ `baseline.py` hoặc các file trong `output/`.
-- Nếu cần, tôi có thể tiếp tục tách README này thành một bản rút gọn hơn hoặc viết thêm bản tiếng Anh riêng.
+- Nếu muốn thay đổi cấu hình MongoDB, hãy kiểm tra lại đường dẫn kết nối trước khi chạy `main.py`.
+- Nếu chỉ muốn xem kết quả so sánh giữa các mô hình, hãy bắt đầu từ `baseline.py` hoặc các file trong `output/`.
