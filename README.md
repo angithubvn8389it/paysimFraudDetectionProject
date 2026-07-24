@@ -16,6 +16,31 @@ Mục tiêu của dự án là:
 - so sánh nhanh giữa mô hình baseline và mô hình Random Forest;
 - lưu lại kết quả đánh giá để dễ theo dõi và tái sử dụng.
 
+## Cách nhập dự án vào máy
+
+Nếu bạn muốn đưa repo này về máy để chạy hoặc chỉnh sửa, hãy làm theo các bước sau:
+
+1. Mở terminal hoặc PowerShell tại thư mục bạn muốn lưu dự án.
+2. Clone repo từ GitHub:
+
+```powershell
+git clone https://github.com/angithubvn8389it/paysimFraudDetectionProject.git
+```
+
+3. Di chuyển vào thư mục dự án:
+
+```powershell
+cd paysimFraudDetectionProject
+```
+
+4. Mở dự án trong VS Code nếu cần:
+
+```powershell
+code .
+```
+
+Nếu bạn tải source bằng file `.zip` thay vì clone, chỉ cần giải nén vào một thư mục và mở thư mục đó trong VS Code.
+
 ## Thông tin về chương trình
 
 Các thành phần chính trong dự án:
