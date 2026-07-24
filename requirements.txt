@@ -1,0 +1,11 @@
+pyspark==3.5.1
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+pymongo
+jupyter
+imbalanced-learn
+streamlit
+kafka-python

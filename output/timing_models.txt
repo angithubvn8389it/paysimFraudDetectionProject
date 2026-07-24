@@ -1,0 +1,17 @@
+Model: baseline
+  data_load: 0.9250539000204299
+  feature_matrix_creation: 0.056546199979493394
+  model_init: 3.63999861292541e-05
+  training: 3.4869830000097863
+  evaluation: 0.2162020000105258
+  saving: 0.005800400016596541
+
+Model: random_forest
+  spark_session_create: 19.639836600021226
+  spark_load_data: 7.259050799999386
+  spark_preprocess: 0.7586145999957807
+  spark_split: 0.10136440000496805
+  spark_feature_assembly: 63.68919580001966
+  spark_training: 204.5147249000147
+  spark_save: 6.301887900015572
+
