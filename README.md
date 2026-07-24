@@ -1,131 +1,609 @@
-# Phát hiện gian lận theo thời gian thực theo bộ dữ liệu Paysim
+# Phát hiện gian lận giao dịch thẻ theo thời gian thực
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?logo=python&logoColor=white)
 ![PySpark](https://img.shields.io/badge/PySpark-Spark-E25A1C?logo=apachespark&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-Database-47A248?logo=mongodb&logoColor=white)
 
-Dự án này xây dựng một pipeline học máy đầu-cuối để phát hiện giao dịch gian lận trên bộ dữ liệu Paysim. Hệ thống sử dụng PySpark để xử lý dữ liệu lớn, huấn luyện mô hình Random Forest, đánh giá kết quả và xuất các biểu đồ, metrics cũng như dự đoán ra file hoặc MongoDB.
+## 1. Giới thiệu dự án
 
-## Giới thiệu
+Dự án **"Phát hiện gian lận giao dịch thẻ theo thời gian thực"** xây dựng hệ thống phát hiện các giao dịch gian lận dựa trên công nghệ Big Data kết hợp với Machine Learning và Deep Learning.
 
-Mục tiêu của dự án là:
+Hệ thống sử dụng:
 
-- phát hiện các giao dịch có khả năng gian lận;
-- xử lý dữ liệu giao dịch lớn bằng Spark;
-- so sánh nhanh giữa mô hình baseline và mô hình Random Forest;
-- lưu lại kết quả đánh giá để dễ theo dõi và tái sử dụng.
+- **MongoDB**: Lưu trữ dữ liệu giao dịch dưới dạng NoSQL.
+- **Apache Spark / PySpark**: Xử lý dữ liệu phân tán.
+- **Spark MLlib**: Huấn luyện mô hình Machine Learning.
+- **TensorFlow/Keras**: Xây dựng mô hình Deep Neural Network.
+- **MongoDB Spark Connector**: Kết nối trực tiếp giữa MongoDB và Spark.
 
-## Cách nhập dự án vào máy
+Mục tiêu của hệ thống:
 
-Nếu bạn muốn đưa repo này về máy để chạy hoặc chỉnh sửa, hãy làm theo các bước sau:
+- Thu thập và lưu trữ dữ liệu giao dịch lớn.
+- Tiền xử lý dữ liệu bằng Spark.
+- Huấn luyện mô hình phát hiện gian lận.
+- Dự đoán giao dịch bất thường.
+- Lưu kết quả dự đoán trở lại MongoDB.
 
-1. Mở terminal hoặc PowerShell tại thư mục bạn muốn lưu dự án.
-2. Clone repo từ GitHub:
+---
 
-```powershell
-git clone https://github.com/angithubvn8389it/paysimFraudDetectionProject.git
+# 2. Kiến trúc hệ thống
+
+Luồng xử lý chính:
+
+```
+Transaction Dataset
+        |
+        v
+     MongoDB
+        |
+        v
+ MongoDB Spark Connector
+        |
+        v
+     Apache Spark
+        |
+        v
+ Data Preprocessing
+        |
+        v
+ Feature Engineering
+        |
+        v
+ Machine Learning / Deep Learning Model
+        |
+        v
+ Fraud Prediction
+        |
+        v
+ Save Result to MongoDB
 ```
 
-3. Di chuyển vào thư mục dự án:
+---
 
-```powershell
-cd paysimFraudDetectionProject
+# 3. Yêu cầu hệ thống
+
+## Hardware tối thiểu
+
+| Thành phần | Yêu cầu |
+|---|---|
+| CPU | Intel Core i5 hoặc tương đương |
+| RAM | 8GB trở lên |
+| Storage | Tối thiểu 10GB trống |
+
+---
+
+## Software requirements
+
+| Phần mềm | Phiên bản đề xuất |
+|-|-|
+| Python | 3.11 |
+| Java JDK | 11 |
+| Apache Spark | 4.1.2 |
+| Hadoop | 3.3.4 |
+| MongoDB | 8.x |
+| Scala | 2.13 |
+| TensorFlow | 2.x |
+
+---
+
+# 4. Cài đặt môi trường
+
+## 4.1 Cài đặt Java JDK 11
+
+Apache Spark yêu cầu Java Runtime Environment.
+
+Download:
+
+https://adoptium.net/temurin/releases/?version=11
+
+Sau khi cài đặt, kiểm tra:
+
+```bash
+java -version
 ```
 
-4. Mở dự án trong VS Code nếu cần:
+Kết quả mong muốn:
 
-```powershell
-code .
+```
+openjdk version "11.x.x"
 ```
 
-Nếu bạn tải source bằng file `.zip` thay vì clone, chỉ cần giải nén vào một thư mục và mở thư mục đó trong VS Code.
+Thiết lập biến môi trường:
 
-## Thông tin về chương trình
+Windows:
 
-Các thành phần chính trong dự án:
-
-- `main.py`: chạy toàn bộ pipeline huấn luyện và đánh giá.
-- `baseline.py`: chạy mô hình baseline để so sánh.
-- `timing.py`: đo thời gian thực thi các giai đoạn của pipeline.
-- `visualization/visualize.py`: tạo các biểu đồ đánh giá như ma trận nhầm lẫn, ROC, Precision-Recall và feature importance.
-- `mongodb/import_data.py`: nhập dữ liệu thô vào MongoDB.
-- `spark/`: chứa các bước tiền xử lý, huấn luyện và đánh giá trên Spark.
-
-Thư mục đầu ra thường gồm:
-
-- `output/metrics.csv`, `output/metrics.json`: các chỉ số đánh giá của mô hình.
-- `output/metrics_baseline.csv`: kết quả của mô hình baseline.
-- `output/timing_models.txt`: thời gian chạy từng giai đoạn của pipeline.
-- `output/`: các biểu đồ và báo cáo được tạo ra trong quá trình chạy.
-
-## Yêu cầu cài đặt
-
-Trước khi chạy dự án, bạn cần có:
-
-- Python 3.8 trở lên;
-- Java tương thích với PySpark;
-- MongoDB local hoặc MongoDB Atlas;
-- các thư viện Python trong `requirements.txt`.
-
-## Cài đặt
-
-1. Cài các thư viện cần thiết:
-
-```powershell
-python -m pip install -r requirements.txt
+```
+JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-11.x.x
 ```
 
-2. Cấu hình MongoDB nếu cần:
+Thêm vào PATH:
 
-- kiểm tra và chỉnh URI kết nối trong `spark/preprocessing/preprocess.py`;
-- nếu dùng MongoDB local, bạn có thể import dữ liệu thô trước khi chạy pipeline.
-
-3. Nạp dữ liệu vào MongoDB (tùy chọn):
-
-```powershell
-python mongodb/import_data.py
+```
+%JAVA_HOME%\bin
 ```
 
-## Cách sử dụng
+---
 
-### Chạy pipeline chính
+# 5. Cài đặt Apache Spark
 
-Lệnh sau sẽ khởi chạy toàn bộ quy trình: đọc dữ liệu, tiền xử lý, huấn luyện mô hình, đánh giá và lưu kết quả.
+## 5.1 Download Spark
 
-```powershell
-python main.py
+Truy cập:
+
+https://spark.apache.org/downloads.html
+
+
+Chọn:
+
+```
+Spark release:
+4.1.2
+
+Package type:
+Pre-built for Apache Hadoop 3.3
 ```
 
-### Chạy mô hình baseline
+Download file `.tgz`.
 
-Nếu bạn muốn chạy mô hình baseline để so sánh với Random Forest:
+Ví dụ:
 
-```powershell
-python baseline.py
+```
+spark-4.1.2-bin-hadoop3.tgz
 ```
 
-### Đo thời gian thực thi
+Giải nén:
 
-Để ghi lại thời gian cho từng giai đoạn của pipeline:
+Ví dụ:
 
-```powershell
-python timing.py
+```
+C:\spark
 ```
 
-## Kết quả sau khi chạy
+---
 
-Sau khi chạy xong, bạn sẽ thấy các kết quả chính được lưu trong thư mục `output/` và `models/`:
+## 5.2 Thiết lập biến môi trường Spark
 
-- các file metrics để theo dõi hiệu năng mô hình;
-- các biểu đồ đánh giá như ROC, Precision-Recall, ma trận nhầm lẫn;
-- mô hình đã huấn luyện được lưu trong `models/`;
-- dự đoán cuối cùng có thể được ghi vào MongoDB.
+Windows Environment Variables:
 
-## Cấu trúc thư mục
+Thêm:
 
-- `data/`: dữ liệu raw và dữ liệu đã xử lý.
-- `models/`: mô hình đã huấn luyện.
-- `mongodb/`: script nhập dữ liệu và tạo index MongoDB.
-- `output/`: metrics, biểu đồ và các file kết quả.
-- `spark/`: mã nguồn cho xử lý dữ liệu, huấn luyện và đánh giá bằng Spark.
-- `visualization/`: các script trực quan hóa.
+```
+SPARK_HOME=C:\spark
+```
+
+PATH:
+
+```
+%SPARK_HOME%\bin
+```
+
+Kiểm tra:
+
+```bash
+spark-shell
+```
+
+Nếu thành công sẽ xuất hiện:
+
+```
+Spark session available as 'spark'
+```
+
+---
+
+# 6. Cài đặt Hadoop Winutils (Windows)
+
+Nếu chạy Spark trên Windows cần Hadoop binary.
+
+Download:
+
+https://github.com/cdarlint/winutils
+
+
+Copy:
+
+```
+winutils.exe
+```
+
+vào:
+
+```
+C:\hadoop\bin
+```
+
+Thiết lập:
+
+```
+HADOOP_HOME=C:\hadoop
+```
+
+PATH:
+
+```
+%HADOOP_HOME%\bin
+```
+
+Kiểm tra:
+
+```bash
+winutils.exe ls
+```
+
+---
+
+# 7. Cài đặt MongoDB
+
+## 7.1 Download MongoDB Community Server
+
+Download:
+
+https://www.mongodb.com/try/download/community
+
+
+Chọn:
+
+```
+MongoDB Community Server
+Windows
+MSI Installer
+```
+
+---
+
+## 7.2 Khởi động MongoDB
+
+Sau khi cài đặt:
+
+Start MongoDB service:
+
+Windows:
+
+```
+Services
+    |
+    MongoDB Server
+    |
+    Start
+```
+
+Hoặc chạy:
+
+```bash
+mongod
+```
+
+---
+
+Kiểm tra:
+
+```bash
+mongosh
+```
+
+Nếu kết nối thành công:
+
+```
+test>
+```
+
+---
+
+# 8. Import dữ liệu vào MongoDB
+
+Dataset sử dụng:
+
+PaySim Fraud Detection Dataset
+
+Download:
+
+https://www.kaggle.com/datasets/ealaxi/paysim1
+
+
+Sau khi tải dataset:
+
+Ví dụ:
+
+```
+dataset/
+    paysim.csv
+```
+
+---
+
+Import dữ liệu:
+
+```bash
+mongoimport ^
+--db fraud_detection ^
+--collection transactions ^
+--type csv ^
+--headerline ^
+--file paysim.csv
+```
+
+Kiểm tra:
+
+```bash
+mongosh
+
+use fraud_detection
+
+db.transactions.findOne()
+```
+
+---
+
+# 9. Cài đặt Python Environment
+
+Khuyến nghị sử dụng Virtual Environment.
+
+Tạo môi trường:
+
+```bash
+python -m venv venv
+```
+
+Kích hoạt:
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+---
+
+Cài thư viện:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+File requirements bao gồm:
+
+```
+pyspark
+pymongo
+pandas
+numpy
+scikit-learn
+tensorflow
+matplotlib
+seaborn
+```
+
+---
+
+# 10. Cài đặt MongoDB Spark Connector
+
+MongoDB Spark Connector cho phép Spark đọc/ghi trực tiếp dữ liệu MongoDB.
+
+## Phiên bản sử dụng
+
+```
+MongoDB Spark Connector:
+10.5.x
+
+Spark:
+4.1.2
+
+Scala:
+2.13
+```
+
+---
+
+## Cách 1: Cấu hình khi chạy Spark
+
+Thêm package:
+
+```bash
+--packages org.mongodb.spark:mongo-spark-connector_2.13:10.5.0
+```
+
+Ví dụ:
+
+```bash
+spark-submit ^
+--packages org.mongodb.spark:mongo-spark-connector_2.13:10.5.0 ^
+main.py
+```
+
+---
+
+## Cách 2: Cấu hình trong SparkSession
+
+Trong Python:
+
+```python
+from pyspark.sql import SparkSession
+
+
+spark = SparkSession.builder \
+    .appName("FraudDetection") \
+    .config(
+        "spark.mongodb.read.connection.uri",
+        "mongodb://localhost:27017/fraud_detection.transactions"
+    ) \
+    .config(
+        "spark.mongodb.write.connection.uri",
+        "mongodb://localhost:27017/fraud_detection.results"
+    ) \
+    .getOrCreate()
+```
+
+---
+
+# 11. Chạy chương trình
+
+## 11.1 Clone repository
+
+```bash
+git clone <repository-url>
+
+cd BigData-Fraud-Detection
+```
+
+---
+
+## 11.2 Kiểm tra MongoDB
+
+Đảm bảo MongoDB đang chạy:
+
+```bash
+mongosh
+```
+
+---
+
+## 11.3 Chạy chương trình Spark
+
+Ví dụ:
+
+```bash
+spark-submit ^
+--packages org.mongodb.spark:mongo-spark-connector_2.13:10.5.0 ^
+src/main.py
+```
+
+---
+
+# 12. Cấu trúc thư mục
+
+```
+BigData-Fraud-Detection/
+
+│
+├── dataset/
+│   └── paysim.csv
+│
+├── src/
+│   │
+│   ├── preprocessing.py
+│   ├── feature_engineering.py
+│   ├── train_model.py
+│   ├── predict.py
+│   └── main.py
+│
+├── models/
+│   ├── random_forest.pkl
+│   └── dnn_model.keras
+│
+├── results/
+│   ├── predictions.csv
+│   └── evaluation_metrics.txt
+│
+├── requirements.txt
+│
+└── README.md
+```
+
+---
+
+# 13. Kết quả đầu ra
+
+Sau khi chạy hệ thống:
+
+MongoDB sẽ chứa collection:
+
+```
+fraud_detection.results
+```
+
+Bao gồm:
+
+| Field | Ý nghĩa |
+|-|-|
+| transaction_id | Mã giao dịch |
+| features | Các thuộc tính giao dịch |
+| prediction | Kết quả dự đoán |
+| probability | Xác suất gian lận |
+
+Ví dụ:
+
+```json
+{
+    "transaction_id": 12345,
+    "prediction": 1,
+    "probability": 0.98
+}
+```
+
+Trong đó:
+
+```
+0 : Giao dịch bình thường
+
+1 : Giao dịch gian lận
+```
+
+---
+
+# 14. Các lỗi thường gặp
+
+## Spark không tìm thấy Java
+
+Lỗi:
+
+```
+JAVA_HOME is not set
+```
+
+Khắc phục:
+
+Kiểm tra:
+
+```bash
+echo %JAVA_HOME%
+```
+
+---
+
+## MongoDB Connector không tải được
+
+Kiểm tra:
+
+```bash
+spark-submit --packages org.mongodb.spark:mongo-spark-connector_2.13:10.5.0
+```
+
+Đảm bảo có Internet khi chạy lần đầu.
+
+---
+
+## Spark lỗi Hadoop
+
+Lỗi:
+
+```
+winutils.exe not found
+```
+
+Khắc phục:
+
+Kiểm tra:
+
+```
+C:\hadoop\bin\winutils.exe
+```
+
+---
+
+# 15. Tác giả
+
+Sinh viên thực hiện:
+
+**Đặng Đức An**
+
+Môn học:
+
+**Nhập môn Phân tích Dữ liệu lớn**
+
+Trường:
+
+**Đại học Văn Lang**
+
+Năm học: 2026
