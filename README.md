@@ -1031,18 +1031,10 @@ trong MongoDB Compass.
 
 # 15. Tác giả
 
-Sinh viên thực hiện:
+Sinh viên thực hiện: **Đặng Đức An**
 
-**Đặng Đức An**
+Môn học: **Nhập môn Phân tích Dữ liệu lớn**
 
-Môn học:
+Trường: **Đại học Văn Lang**
 
-**Nhập môn Phân tích Dữ liệu lớn**
-
-Trường:
-
-**Đại học Văn Lang**
-
-Năm học:
-
-**2026**
+Năm học: **2025-2026**
