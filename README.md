@@ -295,7 +295,7 @@ MongoDB Compass là công cụ giao diện đồ họa (GUI) chính thức của
 Trong dự án này, MongoDB Compass được sử dụng để:
 
 - Kiểm tra dữ liệu sau khi import.
-- Quan sát collection `transactions`.
+- Quan sát collection `paysimData`.
 - Theo dõi kết quả dự đoán trong collection `fraudResults`.
 - Thực hiện truy vấn dữ liệu.
 
@@ -397,7 +397,7 @@ Databases
 ├── admin
 ├── config
 ├── local
-└── fraud_detection
+└── fraudDetection
 ```
 
 ---
@@ -407,15 +407,15 @@ Databases
 Database sử dụng trong dự án:
 
 ```
-fraud_detection
+fraudDetection
 ```
 
 Các collection:
 
 ```
-fraud_detection
+fraudDetection
 
-├── transactions
+├── paysimData
 │
 └── fraudResults
 ```
@@ -424,7 +424,7 @@ Trong đó:
 
 | Collection | Chức năng |
 |-|-|
-| transactions | Dữ liệu giao dịch ban đầu |
+| paysimData | Dữ liệu giao dịch ban đầu từ Paysim |
 | fraudResults | Kết quả dự đoán gian lận |
 
 ---
@@ -434,7 +434,7 @@ Trong đó:
 Chọn:
 
 ```
-fraud_detection
+fraudDetection
         |
         └── fraudResults
 ```
@@ -471,7 +471,7 @@ Ví dụ cấu trúc:
 ```
 dataset/
 
-└── paysim.csv
+└── paysimLog.csv
 ```
 
 ---
@@ -484,11 +484,11 @@ Chạy:
 
 ```bash
 mongoimport ^
---db fraud_detection ^
---collection transactions ^
+--db fraudDetection ^
+--collection oaysimData ^
 --type csv ^
 --headerline ^
---file paysim.csv
+--file paysimLog.csv
 ```
 
 Giải thích:
@@ -514,7 +514,7 @@ mongosh
 Chọn database:
 
 ```javascript
-use fraud_detection
+use fraudDetection
 ```
 
 Kiểm tra collection:
@@ -526,7 +526,7 @@ show collections
 Kết quả:
 
 ```
-transactions
+paysimData
 ```
 
 Xem một document:
@@ -643,11 +643,11 @@ spark = SparkSession.builder \
     .appName("FraudDetection") \
     .config(
         "spark.mongodb.read.connection.uri",
-        "mongodb://localhost:27017/fraud_detection.transactions"
+        "mongodb://localhost:27017/fraudDetection.paysimData"
     ) \
     .config(
         "spark.mongodb.write.connection.uri",
-        "mongodb://localhost:27017/fraud_detection.fraudResults"
+        "mongodb://localhost:27017/fraudDetection.fraudResults"
     ) \
     .getOrCreate()
 ```
@@ -661,7 +661,7 @@ spark = SparkSession.builder \
 ```bash
 git clone <repository-url>
 
-cd BigData-Fraud-Detection
+cd paysimFraudDetectionProject
 ```
 
 ---
@@ -683,7 +683,7 @@ show databases
 Database:
 
 ```
-fraud_detection
+fraudDetection
 ```
 
 ---
@@ -707,7 +707,7 @@ Spark sẽ:
 1. Đọc dữ liệu từ MongoDB collection:
 
 ```
-fraud_detection.transactions
+fraudDetection.paysimData
 ```
 
 2. Tiền xử lý dữ liệu.
@@ -717,7 +717,7 @@ fraud_detection.transactions
 4. Ghi kết quả dự đoán vào:
 
 ```
-fraud_detection.fraudResults
+fraudDetection.fraudResults
 ```
 
 ---
@@ -725,33 +725,38 @@ fraud_detection.fraudResults
 # 12. Cấu trúc thư mục
 
 ```
-BigData-Fraud-Detection/
-
-│
-├── dataset/
-│   └── paysim.csv
-│
-├── src/
-│   │
-│   ├── preprocessing.py
-│   ├── feature_engineering.py
-│   ├── train_model.py
-│   ├── predict.py
-│   └── main.py
-│
+paysimFraudDetectionProject/
+├── baseline.py
+├── main.py
+├── timing.py
+├── README.md
+├── data/
+│   ├── raw_data/
+│   └── processed/
 ├── models/
-│   ├── random_forest.pkl
-│   └── dnn_model.keras
-│
-├── results/
-│   ├── predictions.csv
-│   └── evaluation_metrics.txt
-│
-├── requirements.txt
-│
-└── README.md
+│   ├── baseline_lr/
+│   └── fraud_rf_model/
+├── mongodb/
+│   ├── create_indexes.js
+│   └── import_data.py
+├── output/
+│   ├── analysis/
+│   ├── eda/
+│   ├── metrics.csv
+│   ├── metrics.json
+│   ├── metrics.txt
+│   ├── metrics_baseline.csv
+│   ├── metrics_baseline.txt
+│   ├── timing_models.txt
+│   └── timing_models.png
+├── spark/
+│   ├── evaluation/
+│   ├── preprocessing/
+│   ├── streaming/
+│   └── training/
+└── visualization/
+    └── visualize.py
 ```
-
 ---
 
 # 13. Kết quả đầu ra
@@ -761,7 +766,7 @@ Sau khi hệ thống hoàn thành dự đoán, kết quả được lưu vào Mo
 Database:
 
 ```
-fraud_detection
+fraudDetection
 ```
 
 Collection:
@@ -858,8 +863,8 @@ Ví dụ:
 
 | Vị trí | Ý nghĩa |
 |-|-|
-| probability[0] | Xác suất bình thường |
-| probability[1] | Xác suất gian lận |
+| probability[0] | Xác suất giao dịch bình thường |
+| probability[1] | Xác suất giao dịch gian lận |
 
 Kết quả:
 
